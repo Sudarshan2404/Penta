@@ -4,7 +4,7 @@ import User from "../models/user.model.js";
 import z from "zod";
 import bcrypt from "bcrypt";
 
-const TOKEN_COOKIE = "token";
+const TOKEN_COOKIE = "pact_token";
 const cookieOptions = {
   httpOnly: true,
   sameSite: "lax" as const,

@@ -4,6 +4,7 @@ import { email } from "zod";
 import { required } from "zod/mini";
 
 interface UserDocument {
+  userId?: string;
   name?: string;
   username: string;
   email: string;
@@ -12,6 +13,7 @@ interface UserDocument {
 
 const user = new Schema<UserDocument>(
   {
+    userId: String,
     name: String,
     username: {
       type: String,

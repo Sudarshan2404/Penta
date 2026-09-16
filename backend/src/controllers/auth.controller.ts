@@ -36,7 +36,9 @@ const signInSchema = z
 export const signUp = async (req: Request, res: Response) => {
   try {
     const inputData = userSchema.safeParse(req.body);
+    const count = await User.countDocuments();
 
+    const userId = `user_${String(count + 1).padStart(3, "0")}`;
     if (!inputData.success) {
       return res.status(400).json({
         success: false,
@@ -48,6 +50,7 @@ export const signUp = async (req: Request, res: Response) => {
     const hashedPass = await bcrypt.hash(inputData.data.password, 10);
 
     const user = await User.insertOne({
+      userId,
       name: inputData.data.name,
       username: inputData.data.username,
       password: hashedPass,

@@ -140,3 +140,16 @@ export const signOut = (_req: Request, res: Response): void => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+export const getUser = async (_req: Request, res: Response) => {
+  try {
+    const user = await User.findById(res.locals.userId).select("-password").lean();
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    return res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    console.error("Error getting current user", error);
+    return res.status(500).json({ success: false, message: "Unable to retrieve user" });
+  }
+};

@@ -3,6 +3,8 @@ import "dotenv/config";
 import express from "express";
 import dotenv from "dotenv";
 import AuthRoutes from "./routes/auth.route.js";
+import TransactionRoutes from "./routes/transactions.route.js";
+import HealthRoutes from "./routes/health.route.js";
 import { connectDB } from "./config/db.config.js";
 import bodyParser from "body-parser";
 
@@ -32,9 +34,10 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/auth", AuthRoutes);
+app.use("/api/transactions", TransactionRoutes);
+app.use("/api", HealthRoutes);
 
-connectDB().then(() => {
-  app.listen(port, () => {
-    console.log(`server started on http:localhost:${port}`);
-  });
+app.listen(port, () => {
+  console.log(`server started on http://localhost:${port}`);
+  void connectDB();
 });

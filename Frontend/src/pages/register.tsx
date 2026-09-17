@@ -1,4 +1,6 @@
 import { type FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import graph from "../assets/graph.png";
 import Penta from "../assets/Penta.svg";
 
@@ -7,6 +9,8 @@ const PersonIcon = () => <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" f
 const LockIcon = () => <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>;
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "error" | "success"; message: string } | null>(null);
@@ -26,6 +30,8 @@ export default function Register() {
       const result = (await response.json().catch(() => ({}))) as { message?: string };
       if (!response.ok) throw new Error(result.message ?? "Unable to create your account");
       setFeedback({ type: "success", message: result.message ?? "Account created successfully" });
+      await refreshUser();
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       setFeedback({ type: "error", message: error instanceof Error ? error.message : "Unable to create your account" });
     } finally {
@@ -53,7 +59,7 @@ export default function Register() {
           <button className="h-[49px] rounded-[7px] bg-[#20d463] text-[13px] font-semibold text-[#15231a] shadow-lg shadow-[#1dd362]/15 transition hover:bg-[#34e273] disabled:cursor-not-allowed disabled:opacity-70" type="submit" disabled={isSubmitting}>{isSubmitting ? "Creating account..." : <>Create account <span className="ml-2 text-[17px]">&rarr;</span></>}</button>
         </form>
         {feedback && <p className={`mt-4 text-center text-xs ${feedback.type === "error" ? "text-red-400" : "text-[#22d467]"}`}>{feedback.message}</p>}
-        <p className="mt-5 text-center text-[11px] text-[#9299a7]">Already have an account? <a className="ml-1 text-[#22d467] no-underline" href="#signin">Sign in</a></p>
+        <p className="mt-5 text-center text-[11px] text-[#9299a7]">Already have an account? <Link className="ml-1 text-[#22d467] no-underline" to="/signin">Sign in</Link></p>
       </div>
       <p className="absolute bottom-6 hidden text-[10px] text-[#737b89] lg:block"><span className="text-[#23cb64]">Secure</span> &nbsp; Your financial data is encrypted and secure.</p>
     </section>

@@ -7,7 +7,10 @@ export const isAuthenticated = (
   next: NextFunction,
 ) => {
   try {
-    const token = req.cookies("pact_token");
+    const token = req.headers.cookie
+      ?.split(";")
+      .map((cookie) => cookie.trim().split("="))
+      .find(([name]) => name === "pact_token")?.[1];
 
     if (!token) {
       return res
@@ -21,15 +24,21 @@ export const isAuthenticated = (
     }
     const verified = jwt.verify(token, SECRET);
     if (!verified) {
-      res.status(403).json({
+      return res.status(403).json({
         success: false,
         message: "Invalid Token try signing in again to continue",
       });
     }
 
-    next();
+    const userId = typeof verified === "string" ? verified : verified.sub;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Invalid token payload" });
+    }
+    res.locals.userId = userId;
+
+    return next();
   } catch (error) {
     console.error("Error in auth middleware ", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    return res.status(401).json({ success: false, message: "Invalid or expired token" });
   }
 };

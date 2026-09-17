@@ -1,4 +1,6 @@
 import { type FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import graph from "../assets/graph.png";
 import Penta from "../assets/Penta.svg";
 
@@ -28,6 +30,8 @@ const LockIcon = () => (
 );
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "error" | "success"; message: string } | null>(null);
@@ -47,6 +51,8 @@ export default function Login() {
       const result = (await response.json().catch(() => ({}))) as { message?: string };
       if (!response.ok) throw new Error(result.message ?? "Unable to sign in");
       setFeedback({ type: "success", message: result.message ?? "Signed in successfully" });
+      await refreshUser();
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       setFeedback({ type: "error", message: error instanceof Error ? error.message : "Unable to sign in" });
     } finally {
@@ -165,9 +171,7 @@ export default function Login() {
           {feedback && <p className={`mt-4 text-center text-xs ${feedback.type === "error" ? "text-red-400" : "text-[#22d467]"}`}>{feedback.message}</p>}
           <p className="mt-6 text-center text-[11px] text-[#9299a7]">
             New to Penta?{" "}
-            <a className="ml-1 text-[#22d467] no-underline" href="#signup">
-              Create an account
-            </a>
+            <Link className="ml-1 text-[#22d467] no-underline" to="/signup">Create an account</Link>
           </p>
         </div>
         <p className="absolute bottom-6 hidden text-[10px] text-[#737b89] lg:block">

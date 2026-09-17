@@ -37,7 +37,8 @@ app.use("/api/auth", AuthRoutes);
 app.use("/api/transactions", TransactionRoutes);
 app.use("/api", HealthRoutes);
 
-app.listen(port, () => {
-  console.log(`server started on http://localhost:${port}`);
-  void connectDB();
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log(`server started on http://localhost:${port}`);
+  });
 });

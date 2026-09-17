@@ -46,6 +46,17 @@ Loopr/
 
 ## Setup
 
+### Start the full application
+
+After installing dependencies and configuring both environment files below, start the frontend and backend together from the project root:
+
+```bash
+npm install
+npm run dev
+```
+
+This runs the Vite frontend and Express backend concurrently. Open `http://localhost:5173` in your browser.
+
 ### Backend
 
 ```bash
@@ -98,6 +109,9 @@ Open the URL printed by Vite, normally `http://localhost:5173`.
 
 | Location | Command | Purpose |
 | --- | --- | --- |
+| Root | `npm run dev` | Start frontend and backend together |
+| Root | `npm run start:frontend` | Start only the frontend development server |
+| Root | `npm run start:backend` | Build and start only the backend server |
 | `backend` | `npm run build` | Type-check and compile backend files to `dist` |
 | `backend` | `npm run start` | Build and start the API server |
 | `Frontend` | `npm run dev` | Start the Vite development server |

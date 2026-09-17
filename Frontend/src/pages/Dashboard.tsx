@@ -31,7 +31,6 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
-  const [userId, setUserId] = useState("");
 
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -56,7 +55,6 @@ export default function Dashboard() {
         search,
         category,
         status,
-        user_id: userId,
         sortBy,
         sortOrder,
       };
@@ -94,7 +92,7 @@ export default function Dashboard() {
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [page, search, category, status, userId, sortBy, sortOrder]);
+  }, [page, search, category, status, sortBy, sortOrder]);
 
   const handleSort = (field: string) => {
     if (sortBy === field) {
@@ -111,7 +109,6 @@ export default function Dashboard() {
     setSearch("");
     setCategory("");
     setStatus("");
-    setUserId("");
     setPage(1);
   };
 
@@ -124,7 +121,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#242730] text-white">
-      <Sidebar active={activeNav} onChange={selectNavigation} userName={user?.name || user?.username} avatar={user?.avtar} />
+      <Sidebar active={activeNav} onChange={selectNavigation} />
 
       <main className="ml-[210px] min-h-screen bg-[#242730]">
         {/* Top bar */}
@@ -146,9 +143,10 @@ export default function Dashboard() {
             </button>
 
             <img
-              src="https://thispersondoesnotexist.com/"
+              src={user?.avtar || defaultAvatar}
               alt="Profile"
               className="h-8 w-8 rounded-full object-cover"
+              onError={(event) => { event.currentTarget.src = defaultAvatar; }}
             />
           </div>
         </header>

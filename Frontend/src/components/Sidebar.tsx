@@ -1,6 +1,5 @@
 import {
   BarChart3,
-  ChevronDown,
   CreditCard,
   Grid2X2,
   Mail,
@@ -10,13 +9,10 @@ import {
 } from "lucide-react";
 
 import PentaLogo from "../assets/Penta.svg";
-import defaultAvatar from "../assets/defaultAvtar.svg";
 
 interface SidebarProps {
   active: string;
   onChange: (item: string) => void;
-  userName?: string;
-  avatar?: string;
 }
 
 const items = [
@@ -32,8 +28,6 @@ const items = [
 export default function Sidebar({
   active,
   onChange,
-  userName = "Financial Analyst",
-  avatar,
 }: SidebarProps) {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 flex w-[210px] flex-col bg-[#17191f] px-5 py-7">
@@ -73,24 +67,6 @@ export default function Sidebar({
           );
         })}
       </nav>
-
-      <div className="mt-auto rounded-xl bg-[#1e2129] p-3">
-        <div className="flex items-center gap-3">
-          <img
-            src={avatar || defaultAvatar}
-            alt="Profile"
-            className="h-9 w-9 rounded-full object-cover"
-            onError={(event) => { event.currentTarget.src = defaultAvatar; }}
-          />
-          <div className="min-w-0">
-            <p className="truncate text-xs font-medium text-white">
-              {userName}
-            </p>
-            <p className="text-[11px] text-[#777b85]">My account</p>
-          </div>
-          <ChevronDown size={15} className="ml-auto text-[#777b85]" />
-        </div>
-      </div>
     </aside>
   );
 }

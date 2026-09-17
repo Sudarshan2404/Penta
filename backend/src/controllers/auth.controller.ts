@@ -33,19 +33,40 @@ const signInSchema = z
     path: ["email"],
   });
 
+const validationMessage = (error: z.ZodError) => {
+  const issue = error.issues[0];
+  if (!issue) return "Invalid input";
+  const field = issue.path[0];
+  return field ? `${String(field)}: ${issue.message}` : issue.message;
+};
+
 export const signUp = async (req: Request, res: Response) => {
   try {
     const inputData = userSchema.safeParse(req.body);
-    const count = await User.countDocuments();
-
-    const userId = `user_${String(count + 1).padStart(3, "0")}`;
     if (!inputData.success) {
       return res.status(400).json({
         success: false,
-        message: "Invalid Input",
+        message: validationMessage(inputData.error),
         payload: z.treeifyError(inputData.error),
       });
     }
+
+    const existingUser = await User.findOne({
+      $or: [
+        { email: inputData.data.email.toLowerCase() },
+        { username: inputData.data.username },
+      ],
+    }).select("email username").lean();
+
+    if (existingUser) {
+      const message = existingUser.email === inputData.data.email.toLowerCase()
+        ? "An account with this email already exists"
+        : "This username is already taken";
+      return res.status(409).json({ success: false, message });
+    }
+
+    const count = await User.countDocuments();
+    const userId = `user_${String(count + 1).padStart(3, "0")}`;
 
     const hashedPass = await bcrypt.hash(inputData.data.password, 10);
 
@@ -54,7 +75,7 @@ export const signUp = async (req: Request, res: Response) => {
       name: inputData.data.name,
       username: inputData.data.username,
       password: hashedPass,
-      email: inputData.data.email,
+      email: inputData.data.email.toLowerCase(),
     });
 
     const token = createToken(user.id);
@@ -68,6 +89,12 @@ export const signUp = async (req: Request, res: Response) => {
       .json({ success: true, message: "Signed up successfully" });
   } catch (error) {
     console.error("Error while signingUp", error);
+    if (typeof error === "object" && error && "code" in error && error.code === 11000) {
+      const key = "keyPattern" in error && typeof error.keyPattern === "object" && error.keyPattern
+        ? Object.keys(error.keyPattern)[0]
+        : "field";
+      return res.status(409).json({ success: false, message: `${key === "email" ? "Email" : "Username"} already exists` });
+    }
     return res
       .status(500)
       .json({ success: false, message: "An Internal server Error Occured" });
@@ -81,7 +108,7 @@ export const signIn = async (req: Request, res: Response) => {
     if (!inputData.success) {
       return res.status(400).json({
         success: false,
-        message: "Invalid input",
+        message: validationMessage(inputData.error),
         payload: z.treeifyError(inputData.error),
       });
     }

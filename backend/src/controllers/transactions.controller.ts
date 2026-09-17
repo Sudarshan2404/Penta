@@ -35,12 +35,20 @@ export const getTransactions = async (req: Request, res: Response) => {
 
     const filter: any = {};
 
-    // Search
-    if (search) {
+    // Search transactions by the visible user name/username as well as transaction fields.
+    if (typeof search === "string" && search.trim()) {
+      const userMatches = await User.find({
+        $or: [
+          { name: { $regex: search.trim(), $options: "i" } },
+          { username: { $regex: search.trim(), $options: "i" } },
+        ],
+      }).select("userId").lean();
+      const matchingUserIds = userMatches.map((user) => user.userId).filter(Boolean);
       filter.$or = [
         { user_id: { $regex: search, $options: "i" } },
         { category: { $regex: search, $options: "i" } },
         { status: { $regex: search, $options: "i" } },
+        ...(matchingUserIds.length ? [{ user_id: { $in: matchingUserIds } }] : []),
       ];
     }
 
@@ -54,7 +62,7 @@ export const getTransactions = async (req: Request, res: Response) => {
       filter.status = status;
     }
 
-    // User filter
+    // Optional direct user-id filter for API consumers. The dashboard does not send this.
     if (user_id) {
       filter.user_id = user_id;
     }

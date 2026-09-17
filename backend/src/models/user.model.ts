@@ -8,7 +8,8 @@ interface UserDocument {
   name?: string;
   username: string;
   email: string;
-  password?: string;
+  password: string;
+  avtar?: string;
 }
 
 const user = new Schema<UserDocument>(
@@ -26,6 +27,7 @@ const user = new Schema<UserDocument>(
       unique: true,
     },
     password: String,
+    avtar: String,
   },
   { timestamps: true },
 );

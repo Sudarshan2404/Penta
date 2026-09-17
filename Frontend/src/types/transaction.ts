@@ -10,6 +10,7 @@ export interface Transaction {
   status: Status;
   user_id: string;
   user_name?: string;
+  avtar?: string;
   user_profile: string;
 }
 

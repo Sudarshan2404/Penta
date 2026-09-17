@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import type { Transaction } from "../types/transaction";
+import defaultAvatar from "../assets/defaultAvtar.svg";
 
 interface Props {
   transactions: Transaction[];
@@ -94,9 +95,10 @@ export default function TransactionTable({
           >
             <div className="flex items-center gap-3">
               <img
-                src={transaction.user_profile}
+                src={transaction.avtar || defaultAvatar}
                 alt={transaction.user_name ?? "User"}
                 className="h-9 w-9 rounded-lg object-cover"
+                onError={(event) => { event.currentTarget.src = defaultAvatar; }}
               />
 
               <div>

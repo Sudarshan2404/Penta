@@ -6,10 +6,10 @@ import { Parser } from "json2csv";
 const addUserNames = async <T extends { user_id: string }>(transactions: T[]) => {
   const userIds = [...new Set(transactions.map((transaction) => transaction.user_id))];
   const users = await User.find({ userId: { $in: userIds } })
-    .select("userId name username")
+    .select("userId name username avtar")
     .lean();
-  const names = new Map(users.map((user) => [user.userId, user.name || user.username]));
-  return transactions.map((transaction) => ({ ...transaction, user_name: names.get(transaction.user_id) || "Unknown user" }));
+  const profiles = new Map(users.map((user) => [user.userId, { name: user.name || user.username, avtar: user.avtar }]));
+  return transactions.map((transaction) => ({ ...transaction, user_name: profiles.get(transaction.user_id)?.name || "Unknown user", avtar: profiles.get(transaction.user_id)?.avtar }));
 };
 
 export const getTransactions = async (req: Request, res: Response) => {

@@ -18,6 +18,7 @@ import {
 } from "../services/transactions";
 import type { AnalyticsResponse, Transaction } from "../types/transaction";
 import { useAuth } from "../context/AuthContext";
+import defaultAvatar from "../assets/defaultAvtar.svg";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -123,7 +124,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#242730] text-white">
-      <Sidebar active={activeNav} onChange={selectNavigation} userName={user?.name || user?.username} />
+      <Sidebar active={activeNav} onChange={selectNavigation} userName={user?.name || user?.username} avatar={user?.avtar} />
 
       <main className="ml-[210px] min-h-screen bg-[#242730]">
         {/* Top bar */}
@@ -216,9 +217,10 @@ export default function Dashboard() {
                     className="flex items-center gap-2 border-b border-[#292c34] py-2.5 last:border-0"
                   >
                     <img
-                      src={transaction.user_profile}
+                      src={transaction.avtar || defaultAvatar}
                       alt=""
                       className="h-8 w-8 rounded-md object-cover"
+                      onError={(event) => { event.currentTarget.src = defaultAvatar; }}
                     />
 
                     <div className="min-w-0 flex-1">
